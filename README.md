@@ -4,15 +4,16 @@ A collection of interactive educational simulations built with Godot 4.5 and hos
 
 ## 🌐 Live Site
 
-Visit the simulations at: `https://yourusername.github.io`
-
-*(Replace `yourusername` with your actual GitHub username)*
+Visit the simulations at: `https://sfminer.github.io`
 
 ## 📚 Available Simulations
 
-- **Simulation 1** - Description coming soon
-- **Simulation 2** - Description coming soon
-- **Simulation 3** - Description coming soon
+- **Antibiotic Resistance Simulation** - Description coming soon
+- **Evolution Resistance Simulation** - Description coming soon
+
+## In Development
+
+- **Cell Keeper** - Evolve your cell!
 
 ## 🎮 For Students
 
@@ -119,8 +120,8 @@ This repository is primarily for educational use. If you're a student or colleag
 
 ## 📧 Contact
 
-For questions or issues with the simulations, please contact [Your Name/Email].
+For questions or issues with the simulations, please contact sfminer@gmail.com
 
 ---
 
-**Built with:** Godot 4.5 | **Hosted on:** GitHub Pages | **Updated:** [Current Date]
+**Built with:** Godot 4.5 | **Hosted on:** GitHub Pages | **Updated:** 102025-10-19
