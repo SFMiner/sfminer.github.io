@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Science Simulations</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+		
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			min-height: 100vh;
+			padding: 20px;
+		}
+		
+		.container {
+			max-width: 1000px;
+			margin: 0 auto;
+			background: white;
+			border-radius: 20px;
+			padding: 40px;
+			box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+		}
+		
+		h1 {
+			color: #333;
+			margin-bottom: 10px;
+			font-size: 2.5em;
+		}
+		
+		.subtitle {
+			color: #666;
+			margin-bottom: 40px;
+			font-size: 1.2em;
+		}
+		
+		.simulations-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+			gap: 20px;
+			margin-top: 30px;
+		}
+		
+		.sim-card {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			padding: 30px;
+			border-radius: 15px;
+			text-decoration: none;
+			color: white;
+			transition: transform 0.3s, box-shadow 0.3s;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		}
+		
+		.sim-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+		}
+		
+		.sim-card h2 {
+			margin-bottom: 10px;
+			font-size: 1.5em;
+		}
+		
+		.sim-card p {
+			opacity: 0.9;
+			line-height: 1.6;
+		}
+		
+		.instructions {
+			background: #f0f4ff;
+			padding: 20px;
+			border-radius: 10px;
+			margin-top: 40px;
+			border-left: 4px solid #667eea;
+		}
+		
+		.instructions h3 {
+			color: #667eea;
+			margin-bottom: 10px;
+		}
+		
+		.instructions p {
+			color: #555;
+			line-height: 1.6;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>🔬 Science Simulations</h1>
+		<p class="subtitle">Interactive educational simulations built with Godot</p>
+		
+		<div class="simulations-grid">
+			<!-- Add your simulations here -->
+			<a href="./simulation1/" class="sim-card">
+				<h2>Simulation 1</h2>
+				<p>Description of your first simulation goes here.</p>
+			</a>
+			
+			<a href="./simulation2/" class="sim-card">
+				<h2>Simulation 2</h2>
+				<p>Description of your second simulation goes here.</p>
+			</a>
+			
+			<a href="./simulation3/" class="sim-card">
+				<h2>Simulation 3</h2>
+				<p>Description of your third simulation goes here.</p>
+			</a>
+			
+			<!-- Add more simulation cards as needed -->
+		</div>
+		
+		<div class="instructions">
+			<h3>📱 For Students</h3>
+			<p>Click any card above to launch a simulation. These work on any device including Chromebooks. If you experience any issues, try refreshing the page or using a different browser.</p>
+		</div>
+	</div>
+</body>
+</html>
