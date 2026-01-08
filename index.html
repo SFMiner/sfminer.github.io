@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Science Simulations</title>
+	<title>Math and Science Simulations</title>
 	<style>
 		* {
 			margin: 0;
@@ -56,7 +56,22 @@
 			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 		}
 		
+		.sim-card-b {
+			background: linear-gradient(135deg, #71ea66 0%, #a2924b 100%);
+			padding: 30px;
+			border-radius: 15px;
+			text-decoration: none;
+			color: white;
+			transition: transform 0.3s, box-shadow 0.3s;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		}
+		
+
 		.sim-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+		}
+		.sim-card-b:hover {
 			transform: translateY(-5px);
 			box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 		}
@@ -65,7 +80,14 @@
 			margin-bottom: 10px;
 			font-size: 1.5em;
 		}
-		
+		.sim-card-b h2 {
+			margin-bottom: 10px;
+			font-size: 1.5em;
+		}		
+		.sim-card-b p {
+			opacity: 0.9;
+			line-height: 1.6;
+		}
 		.sim-card p {
 			opacity: 0.9;
 			line-height: 1.6;
@@ -92,29 +114,45 @@
 </head>
 <body>
 	<div class="container">
-		<h1>🔬 Science Simulations</h1>
+		<h1>🔬 Math and Science Simulations</h1>
 		<p class="subtitle">Interactive educational simulations built with Godot</p>
 		
 		<div class="simulations-grid">
 			<!-- Add your simulations here -->
-			<a href="./simulation1/" class="sim-card">
-				<h2>Antibiotic Resistance Simulation</h2>
-				<p>Description of your first simulation goes here.</p>
+			<a href="./areazoo/" class="sim-card">
+				<h2>Area Zoo</h2>
+				<p>Use area and perimeter to build a zoo!</p>
 			</a>
 			
-			<a href="./simulation2/" class="sim-card">
-				<h2>Natural Selection Simulation</h2>
-				<p>Be the predator thatpressured your prey to adapt!</p>
+			<a href="./bio-mite/" class="sim-card">
+				<h2>Bio-Mite Architect!</h2>
+				<p>Pick the right chromosomes to build you adorable Bio-Mite!</p>
 			</a>
 			
-			<a href="./simulation3/" class="sim-card">
-				<h2>Biosphere Simulator!</h2> 
-				<p>Simulation of a DIY Biosphere-in-a-jar! Graphics will be added soon.</p>
+			<a href="./cascadia/" class="sim-card-b">
+				<h2>Cascadia</h2> 
+				<p>Take a short walk through a fiver valey. See hwat happens when you let in the wolves...</p>
 			</a>
+
+			<a href="./desertloop/" class="sim-card-b">
+				<h2>Desert Loop</h2> 
+				<p>Build an ecosystem int he desert, from the sand up!</p>
+			</a>
+			
+			<a href="./dna_simulator/" class="sim-card">
+				<h2>DNA Simulator</h2> 
+				<p>Build a strand of DNA from the four nucleotides.</p>
+			</a>
+
+			<a href="./transform_tetris/" class="sim-card">
+				<h2>Transformation Tetris</h2> 
+				<p>Play tetris by calling rigid transformations!</p>
+			</a>
+			
 			
 			<!--<a href="./simulation4/" class="sim-card">-->
-				<h2>Cell Keeper! (in development)</h2> 
-				<p>Keep your cell alive and help ity evolve!</p>
+			<!--	<h2>Cell Keeper! (in development)</h2> 
+				<p>Keep your cell alive and help ity evolve!</p>-->
 			<!--<</a>-->
 			<!-- Add more simulation cards as needed -->
 		</div>
