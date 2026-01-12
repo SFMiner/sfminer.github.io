@@ -11,9 +11,6 @@ Visit the simulations at: `https://sfminer.github.io`
 - **Antibiotic Resistance Simulation** - Description coming soon
 - **Evolution Resistance Simulation** - Description coming soon
 
-## In Development
-
-- **Cell Keeper** - Evolve your cell!
 
 ## 🎮 For Students
 
