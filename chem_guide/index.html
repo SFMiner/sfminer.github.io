@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matter and Energy in Change — Review</title>
+<style>
+  :root {
+    --blue:   #1a4fa0;
+    --green:  #1a7a3c;
+    --orange: #b85c00;
+    --purple: #5b1a8a;
+    --red:    #9a1a1a;
+    --teal:   #006b6b;
+    --gray:   #2c2c2c;
+    --light:  #f4f6fb;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #1a1a2e;
+    color: #111;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Progress bar ── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 6px;
+    background: #4fc3f7;
+    transition: width 0.3s ease;
+    z-index: 100;
+  }
+
+  /* ── Slide counter ── */
+  #counter {
+    position: fixed;
+    top: 10px; right: 16px;
+    font-size: 1rem;
+    color: #ccc;
+    z-index: 100;
+  }
+
+  /* ── Slide wrapper ── */
+  #slides {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 60px;
+    background: var(--light);
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    overflow-y: auto;
+  }
+  .slide.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  /* ── Color themes per big idea ── */
+  .theme-title  { background: #1a1a2e; color: #fff; }
+  .theme-blue   { border-top: 12px solid var(--blue); }
+  .theme-green  { border-top: 12px solid var(--green); }
+  .theme-orange { border-top: 12px solid var(--orange); }
+  .theme-purple { border-top: 12px solid var(--purple); }
+  .theme-red    { border-top: 12px solid var(--red); }
+  .theme-teal   { border-top: 12px solid var(--teal); }
+  .theme-quiz   { border-top: 12px solid #555; background: #fff8ee; }
+  .theme-gloss  { border-top: 12px solid var(--gray); }
+
+  /* ── Typography ── */
+  .label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0.65;
+  }
+  .theme-title .label { color: #aac8ff; opacity: 1; }
+
+  h1 {
+    font-size: 2.8rem;
+    font-weight: 900;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+  .theme-title h1 { color: #fff; font-size: 3.2rem; }
+
+  h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 18px;
+    color: var(--gray);
+  }
+
+  .big-text {
+    font-size: 1.45rem;
+    line-height: 1.65;
+    max-width: 820px;
+    color: #222;
+  }
+
+  .sub { font-size: 1.15rem; color: #444; margin-top: 10px; line-height: 1.6; }
+
+  /* ── Subtitle on title slide ── */
+  .theme-title .sub { color: #cce0ff; font-size: 1.3rem; }
+
+  /* ── Two-column layout ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    width: 100%;
+    max-width: 900px;
+    margin-top: 10px;
+  }
+
+  .card {
+    border-radius: 12px;
+    padding: 22px 26px;
+    text-align: left;
+    font-size: 1.2rem;
+    line-height: 1.6;
+  }
+  .card-blue   { background: #ddeeff; border-left: 6px solid var(--blue); }
+  .card-green  { background: #d8f5e4; border-left: 6px solid var(--green); }
+  .card-orange { background: #ffeedd; border-left: 6px solid var(--orange); }
+  .card-purple { background: #eeddff; border-left: 6px solid var(--purple); }
+  .card-red    { background: #ffe0e0; border-left: 6px solid var(--red); }
+  .card-teal   { background: #d8f5f5; border-left: 6px solid var(--teal); }
+  .card-gray   { background: #eee; border-left: 6px solid #888; }
+
+  .card-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+
+  /* ── Evidence list ── */
+  .ev-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+    max-width: 700px;
+    width: 100%;
+    margin-top: 6px;
+  }
+  .ev-list li {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px 20px;
+    font-size: 1.3rem;
+    border-left: 6px solid var(--orange);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .ev-list .icon { font-size: 1.6rem; }
+
+  /* ── Property table ── */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 820px;
+    font-size: 1.1rem;
+    margin-top: 6px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  }
+  thead tr { background: var(--blue); color: #fff; }
+  th { padding: 13px 16px; text-align: left; font-size: 1rem; }
+  td { padding: 12px 16px; border-bottom: 1px solid #dde; }
+  tr:nth-child(even) td { background: #eef3ff; }
+  tr:last-child td { border-bottom: none; }
+
+  /* ── Glossary list ── */
+  .gloss-list {
+    columns: 2;
+    column-gap: 40px;
+    text-align: left;
+    max-width: 880px;
+    list-style: none;
+  }
+  .gloss-list li {
+    font-size: 1.1rem;
+    line-height: 1.5;
+    padding: 6px 0;
+    border-bottom: 1px solid #ddd;
+    break-inside: avoid;
+  }
+  .gloss-list li strong { color: var(--blue); }
+
+  /* ── Quiz ── */
+  .question-text {
+    font-size: 1.6rem;
+    font-weight: 700;
+    max-width: 760px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    color: #111;
+  }
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 680px;
+  }
+  .choice-btn {
+    background: #fff;
+    border: 3px solid #bbb;
+    border-radius: 12px;
+    padding: 14px 22px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .choice-btn:hover { border-color: #4488cc; background: #eef4ff; }
+  .choice-btn.correct { background: #d4f7dc; border-color: var(--green); color: var(--green); }
+  .choice-btn.wrong   { background: #fde8e8; border-color: var(--red);   color: var(--red);   opacity: 0.6; }
+
+  .choice-letter {
+    display: inline-block;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: #dde;
+    text-align: center;
+    line-height: 32px;
+    font-size: 1rem;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .correct .choice-letter { background: var(--green); color: #fff; }
+  .wrong   .choice-letter { background: var(--red);   color: #fff; }
+
+  .feedback {
+    margin-top: 16px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    min-height: 36px;
+  }
+  .feedback.right { color: var(--green); }
+  .feedback.wrong { color: var(--red);   }
+
+  /* ── Nav ── */
+  #nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    padding: 14px 24px;
+    background: #12122a;
+  }
+  .nav-btn {
+    background: #2a2a50;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 30px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+    min-width: 120px;
+  }
+  .nav-btn:hover { background: #4455aa; }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+  #slide-dots {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 400px;
+  }
+  .dot {
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: #555;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .dot.active { background: #4fc3f7; transform: scale(1.4); }
+
+  /* ── Keyboard hint ── */
+  #kb-hint {
+    position: fixed;
+    bottom: 70px; right: 18px;
+    font-size: 0.8rem;
+    color: #888;
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<div id="counter"></div>
+
+<div id="slides">
+
+  <!-- ══════════ SLIDE 1: TITLE ══════════ -->
+  <div class="slide theme-title active" id="s1">
+    <div class="label">Unit Review</div>
+    <h1>Matter &amp; Energy<br>in Change</h1>
+    <p class="sub">Review the big ideas before your test.<br>Use the arrows — or press ← → on your keyboard.</p>
+  </div>
+
+  <!-- ══════════ SLIDE 2: BIG IDEA 1 ══════════ -->
+  <div class="slide theme-blue" id="s2">
+    <div class="label">Big Idea 1</div>
+    <h2>Substances &amp; Properties</h2>
+    <p class="big-text">A <strong>substance</strong> is a type of matter.<br>
+    Every substance has <strong>properties</strong> — things you can observe or measure — that help us tell them apart.</p>
+    <table style="margin-top:22px">
+      <thead>
+        <tr><th>Property</th><th>What to Look For</th><th>Example</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Color</strong></td><td>What color is it?</td><td>Sugar, salt &amp; baking soda are all white</td></tr>
+        <tr><td><strong>Texture</strong></td><td>How does it feel?</td><td>Grainy (salt) vs. fine powder</td></tr>
+        <tr><td><strong>Smell</strong></td><td>Does it have a scent?</td><td>Very specific — great for ID</td></tr>
+        <tr><td><strong>State</strong></td><td>Solid, liquid, or gas?</td><td>Ice, water, steam = same substance</td></tr>
+        <tr><td><strong>Reaction</strong></td><td>How does it act with others?</td><td>Does it bubble with vinegar?</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════ SLIDE 3: BIG IDEA 2 — Physical vs Chemical ══════════ -->
+  <div class="slide theme-green" id="s3">
+    <div class="label">Big Idea 2</div>
+    <h2>Physical vs. Chemical Changes</h2>
+    <div class="two-col">
+      <div class="card card-blue">
+        <div class="card-title" style="color:var(--blue)">⚡ Physical Change</div>
+        The substance <strong>stays the same</strong>.<br>
+        No new molecules are made.<br><br>
+        <em>Example: Ice melting</em><br>
+        H₂O solid → H₂O liquid<br><br>
+        Only the speed of molecules changes.
+      </div>
+      <div class="card card-orange">
+        <div class="card-title" style="color:var(--orange)">🔥 Chemical Change</div>
+        Atoms <strong>rearrange</strong> to make brand-new substances.<br><br>
+        <em>Examples:</em><br>
+        • Elephant's Toothpaste<br>
+        • Two liquids → cloudy solid (precipitate)<br><br>
+        You <strong>cannot easily undo</strong> it.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SLIDE 4: 5 Signs of a Chemical Change ══════════ -->
+  <div class="slide theme-orange" id="s4">
+    <div class="label">Big Idea 2 — continued</div>
+    <h2>5 Signs of a Chemical Change</h2>
+    <ul class="ev-list">
+      <li><span class="icon">💨</span> <strong>Gas / Bubbles</strong> are produced</li>
+      <li><span class="icon">🎨</span> <strong>Color change</strong> occurs</li>
+      <li><span class="icon">🧊</span> <strong>Precipitate</strong> — a new solid forms in a liquid</li>
+      <li><span class="icon">🌡️</span> <strong>Temperature change</strong> — gets hotter or colder</li>
+      <li><span class="icon">👃</span> <strong>New smell</strong> is created</li>
+    </ul>
+  </div>
+
+  <!-- ══════════ SLIDE 5: BIG IDEA 3 — Conservation of Mass ══════════ -->
+  <div class="slide theme-purple" id="s5">
+    <div class="label">Big Idea 3</div>
+    <h2>Reactants, Products &amp; Mass</h2>
+    <div class="two-col" style="max-width:860px">
+      <div class="card card-purple">
+        <div class="card-title" style="color:var(--purple)">In Every Reaction…</div>
+        <strong>Reactants</strong> = starting substances you put in<br><br>
+        <strong>Products</strong> = new substances you get out<br><br>
+        Atoms don't <em>appear</em> or <em>disappear</em> — they just <strong>move to new spots</strong>.
+      </div>
+      <div class="card card-purple">
+        <div class="card-title" style="color:var(--purple)">⚖️ Conservation of Mass</div>
+        The total mass of <strong>reactants</strong> always equals the total mass of <strong>products</strong>.<br><br>
+        <em>Example:</em> Vinegar + baking soda in a <strong>sealed</strong> bag → the bag weighs the same before and after. Gas atoms are still inside!
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SLIDE 6: BIG IDEA 4 — Exo vs Endo ══════════ -->
+  <div class="slide theme-red" id="s6">
+    <div class="label">Big Idea 4</div>
+    <h2>Energy in Reactions (Heat)</h2>
+    <div class="two-col">
+      <div class="card card-red">
+        <div class="card-title" style="color:var(--red)">🔥 Exothermic</div>
+        <strong>Releases</strong> heat.<br>
+        Surroundings get <strong>WARMER</strong>.<br><br>
+        Examples:<br>
+        • Hand warmers<br>
+        • Burning wood<br>
+        • Rusting iron
+      </div>
+      <div class="card card-teal">
+        <div class="card-title" style="color:var(--teal)">❄️ Endothermic</div>
+        <strong>Absorbs</strong> heat.<br>
+        Surroundings get <strong>COOLER</strong>.<br><br>
+        Examples:<br>
+        • Instant cold packs<br>
+        • Photosynthesis<br>
+        • Baking soda + vinegar
+      </div>
+    </div>
+    <p class="sub" style="margin-top:18px"><strong>Memory tip:</strong> EXOthermic = EXits heat outward 🔥 &nbsp;|&nbsp; ENDOthermic = ENters heat inward ❄️</p>
+  </div>
+
+  <!-- ══════════ SLIDE 7: BIG IDEA 5 — Combustion ══════════ -->
+  <div class="slide theme-teal" id="s7">
+    <div class="label">Big Idea 5</div>
+    <h2>Combustion &amp; Climate</h2>
+    <p class="big-text"><strong>Combustion</strong> is a chemical reaction where a <strong>fuel burns</strong>.</p>
+    <div class="two-col" style="margin-top:20px">
+      <div class="card card-teal">
+        <div class="card-title" style="color:var(--teal)">The Reaction</div>
+        Fuel + Oxygen<br>
+        ↓<br>
+        CO₂ + Water Vapor + <strong>Energy</strong>
+      </div>
+      <div class="card card-orange">
+        <div class="card-title" style="color:var(--orange)">🌍 The Climate Link</div>
+        Burning fossil fuels releases CO₂.<br><br>
+        CO₂ is a <strong>greenhouse gas</strong> — it traps heat in the atmosphere → <strong>climate change</strong>.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SLIDE 8: GLOSSARY ══════════ -->
+  <div class="slide theme-gloss" id="s8">
+    <div class="label">Key Terms</div>
+    <h2>Glossary</h2>
+    <ul class="gloss-list">
+      <li><strong>Chemical Reaction</strong> — Atoms rearrange to form new substances</li>
+      <li><strong>Combustion</strong> — Burning a fuel with oxygen</li>
+      <li><strong>Endothermic</strong> — Absorbs heat; things feel colder</li>
+      <li><strong>Exothermic</strong> — Releases heat; things feel warmer</li>
+      <li><strong>Fuel</strong> — Substance that releases energy when it burns</li>
+      <li><strong>Precipitate</strong> — New solid that forms when two liquids mix</li>
+      <li><strong>Product</strong> — Ending substance in a reaction</li>
+      <li><strong>Property</strong> — Characteristic used to identify a substance</li>
+      <li><strong>Reactant</strong> — Starting substance in a reaction</li>
+      <li><strong>Substance</strong> — A type of matter with specific properties</li>
+    </ul>
+  </div>
+
+  <!-- ══════════ SLIDES 9–14: QUIZ ══════════ -->
+
+  <div class="slide theme-quiz" id="s9" data-answer="1">
+    <div class="label">Quiz — Question 1 of 6</div>
+    <div class="question-text">Which of these is a <u>physical</u> change?</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answer(this,0)">&nbsp;<span class="choice-letter">A</span>&nbsp; Wood burning</button>
+      <button class="choice-btn" onclick="answer(this,1)">&nbsp;<span class="choice-letter">B</span>&nbsp; Ice melting</button>
+      <button class="choice-btn" onclick="answer(this,2)">&nbsp;<span class="choice-letter">C</span>&nbsp; Iron rusting</button>
+    </div>
+    <div class="feedback" id="fb9"></div>
+  </div>
+
+  <div class="slide theme-quiz" id="s10" data-answer="2">
+    <div class="label">Quiz — Question 2 of 6</div>
+    <div class="question-text">In a chemical reaction, what happens to the atoms?</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answer(this,0)">&nbsp;<span class="choice-letter">A</span>&nbsp; Some atoms are destroyed</button>
+      <button class="choice-btn" onclick="answer(this,1)">&nbsp;<span class="choice-letter">B</span>&nbsp; New atoms are created</button>
+      <button class="choice-btn" onclick="answer(this,2)">&nbsp;<span class="choice-letter">C</span>&nbsp; Atoms rearrange but none disappear</button>
+    </div>
+    <div class="feedback" id="fb10"></div>
+  </div>
+
+  <div class="slide theme-quiz" id="s11" data-answer="1">
+    <div class="label">Quiz — Question 3 of 6</div>
+    <div class="question-text">A reaction makes a cup feel <u>cold</u>. It is:</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answer(this,0)">&nbsp;<span class="choice-letter">A</span>&nbsp; Exothermic</button>
+      <button class="choice-btn" onclick="answer(this,1)">&nbsp;<span class="choice-letter">B</span>&nbsp; Endothermic</button>
+      <button class="choice-btn" onclick="answer(this,2)">&nbsp;<span class="choice-letter">C</span>&nbsp; Combustion</button>
+    </div>
+    <div class="feedback" id="fb11"></div>
+  </div>
+
+  <div class="slide theme-quiz" id="s12" data-answer="0">
+    <div class="label">Quiz — Question 4 of 6</div>
+    <div class="question-text">What are the two reactants needed for combustion (burning)?</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answer(this,0)">&nbsp;<span class="choice-letter">A</span>&nbsp; Fuel and Oxygen</button>
+      <button class="choice-btn" onclick="answer(this,1)">&nbsp;<span class="choice-letter">B</span>&nbsp; CO₂ and Water Vapor</button>
+      <button class="choice-btn" onclick="answer(this,2)">&nbsp;<span class="choice-letter">C</span>&nbsp; Iron and Vinegar</button>
+    </div>
+    <div class="feedback" id="fb12"></div>
+  </div>
+
+  <div class="slide theme-quiz" id="s13" data-answer="1">
+    <div class="label">Quiz — Question 5 of 6</div>
+    <div class="question-text">True or False: If you burn a piece of paper, the mass disappears and no longer exists.</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answer(this,0)">&nbsp;<span class="choice-letter">A</span>&nbsp; True</button>
+      <button class="choice-btn" onclick="answer(this,1)">&nbsp;<span class="choice-letter">B</span>&nbsp; False — the atoms turned into CO₂ gas and water vapor</button>
+    </div>
+    <div class="feedback" id="fb13"></div>
+  </div>
+
+  <div class="slide theme-quiz" id="s14" data-answer="2">
+    <div class="label">Quiz — Question 6 of 6</div>
+    <div class="question-text">Which property is most useful for identifying a substance at a crime scene?</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answer(this,0)">&nbsp;<span class="choice-letter">A</span>&nbsp; Color</button>
+      <button class="choice-btn" onclick="answer(this,1)">&nbsp;<span class="choice-letter">B</span>&nbsp; Texture</button>
+      <button class="choice-btn" onclick="answer(this,2)">&nbsp;<span class="choice-letter">C</span>&nbsp; Smell</button>
+    </div>
+    <div class="feedback" id="fb14"></div>
+  </div>
+
+  <!-- ══════════ SLIDE 15: END ══════════ -->
+  <div class="slide theme-title" id="s15">
+    <div class="label">Review Complete</div>
+    <h1>You're Ready! 🎉</h1>
+    <p class="sub">You reviewed all 5 Big Ideas and 6 quiz questions.<br>Good luck on your test!</p>
+    <p class="sub" style="margin-top:24px; font-size:1rem; opacity:0.6">Press ← to go back and review anything again.</p>
+  </div>
+
+</div><!-- end #slides -->
+
+<!-- ── Navigation ── -->
+<nav id="nav">
+  <button class="nav-btn" id="btn-prev" onclick="move(-1)" disabled>← Back</button>
+  <div id="slide-dots"></div>
+  <button class="nav-btn" id="btn-next" onclick="move(1)">Next →</button>
+</nav>
+
+<div id="kb-hint">← → keys to navigate</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total  = slides.length;
+  let cur = 0;
+
+  // Build dots
+  const dotsEl = document.getElementById('slide-dots');
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.title = `Slide ${i+1}`;
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  });
+
+  function goTo(n) {
+    slides[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = n;
+    slides[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+    document.getElementById('btn-prev').disabled = cur === 0;
+    document.getElementById('btn-next').disabled = cur === total - 1;
+    document.getElementById('counter').textContent = `${cur+1} / ${total}`;
+    document.getElementById('progress-bar').style.width = `${((cur+1)/total)*100}%`;
+  }
+
+  function move(dir) { goTo(Math.max(0, Math.min(total-1, cur + dir))); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown')  move(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')    move(-1);
+  });
+
+  // ── Quiz answer handler ──
+  function answer(btn, chosen) {
+    const slide    = btn.closest('.slide');
+    const correct  = parseInt(slide.dataset.answer);
+    const buttons  = slide.querySelectorAll('.choice-btn');
+    const fbEl     = slide.querySelector('.feedback');
+
+    buttons.forEach(b => b.disabled = true);
+    buttons.forEach((b, i) => {
+      if (i === correct)      b.classList.add('correct');
+      else if (i === chosen)  b.classList.add('wrong');
+    });
+
+    if (chosen === correct) {
+      fbEl.textContent = '✅ Correct!';
+      fbEl.className = 'feedback right';
+    } else {
+      fbEl.textContent = '❌ Not quite — the highlighted answer is correct.';
+      fbEl.className = 'feedback wrong';
+    }
+  }
+
+  // Init
+  goTo(0);
+</script>
+</body>
+</html>
