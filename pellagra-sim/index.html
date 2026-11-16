@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Pellagra Mystery</title>
+		<style>
+html, body { margin: 0; padding: 0; height: 100%; background-color: #0f1722; color: #f2f5f8; font-family: Arial, Helvetica, sans-serif; }
+body { overflow: hidden; touch-action: none; }
+main { position: relative; height: 100%; }
+#canvas { display: block; margin: 0; padding: 0; border: 0; }
+#canvas:focus { outline: none; }
+#canvas:focus-visible { outline: 4px solid #ffd84a; outline-offset: -4px; }
+.vh { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+#status { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; background-color: #0f1722; padding: 16px; text-align: center; font-size: 20px; }
+#status-progress { width: min(50%, 360px); height: 16px; }
+#status-notice { display: none; max-width: 36rem; padding: 16px; border: 2px solid #f2f5f8; background: #1a2633; line-height: 1.4; }
+@media (forced-colors: active) { #status-notice { border-color: CanvasText; } #canvas:focus-visible { outline-color: Highlight; } }
+		</style>
+		<link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png" />
+<link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
+
+	</head>
+	<body>
+		<main id="main">
+			<h1 class="vh">Pellagra Mystery</h1>
+			<canvas id="canvas" tabindex="0" aria-label="Pellagra Mystery. A simulation. Press Tab to reach its controls. Press Escape to leave it.">
+				Your browser cannot show this simulation.
+			</canvas>
+			<noscript><p>This simulation needs JavaScript. Turn it on, or try another browser.</p></noscript>
+			<div id="status">
+				<p id="status-text" role="status">Loading Pellagra Mystery...</p>
+				<progress id="status-progress" aria-label="Loading progress"></progress>
+				<div id="status-notice" role="alert"></div>
+			</div>
+		</main>
+		<!-- Live regions SkHost.announce() writes to. Polite waits for the screen reader; assertive interrupts. -->
+		<div id="sk-status" class="vh" role="status" aria-live="polite" aria-atomic="true"></div>
+		<div id="sk-alert" class="vh" role="alert" aria-live="assertive" aria-atomic="true"></div>
+		<script>
+window.skAnnounce = function (text, assertive) {
+	const el = document.getElementById(assertive ? 'sk-alert' : 'sk-status');
+	if (!el) { return; }
+	el.textContent = '';  // clearing first makes a repeated message announce again
+	window.setTimeout(function () { el.textContent = String(text); }, 50);
+};
+		</script>
+		<script src="index.js"></script>
+		<script>
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":261924,"index.wasm":23993242},"focusCanvas":false,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_THREADS_ENABLED = false;
+(function () {
+	const status = document.getElementById('status');
+	const statusText = document.getElementById('status-text');
+	const progress = document.getElementById('status-progress');
+	const notice = document.getElementById('status-notice');
+	// A readable message instead of a blank screen.
+	function fail(text) {
+		console.error(text);
+		statusText.textContent = 'This simulation could not start.';
+		progress.style.display = 'none';
+		notice.textContent = text;
+		notice.style.display = 'block';
+	}
+	if (typeof Engine === 'undefined') {
+		fail('The simulation files did not load. Check the connection and reload the page.');
+		return;
+	}
+	const missing = Engine.getMissingFeatures({ threads: GODOT_THREADS_ENABLED });
+	if (typeof WebAssembly !== 'object') { missing.push('WebAssembly'); }
+	if (missing.length !== 0) {
+		fail('This browser is missing something the simulation needs (' + missing.join(', ') + '). Try an up-to-date Chrome, Edge or Firefox, or ask your teacher for help.');
+		return;
+	}
+	new Engine(GODOT_CONFIG).startGame({
+		'onProgress': function (current, total) {
+			if (current > 0 && total > 0) { progress.value = current; progress.max = total; }
+			else { progress.removeAttribute('value'); progress.removeAttribute('max'); }
+		},
+	}).then(function () { status.remove(); }, function (err) {
+		fail('Something went wrong while starting. Reload the page to try again. (' + (err && err.message ? err.message : String(err)) + ')');
+	});
+}());
+		</script>
+	</body>
+</html>
+
