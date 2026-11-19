@@ -1,0 +1,45 @@
+{
+	"build_id": "DEV-5cb19fb-20261119T090708Z",
+	"git_commit": "5cb19fbd308a22fd0a5e5e9215bd6c9aed53bbf2",
+	"godot_version": "4.5.stable.official.876b29033",
+	"godot_binary_sha256": "5ea93bab9cb6d2dc0824a41e8465828390f7e870535cd8f0690dcf6fa9db0fd2",
+	"export_template_sha256": "a50579d16fc957df1e9370a17d8d042208977fd271a4288b230fe94a033fabcb",
+	"preset_hash": "e701ad8744b437a4591c49589b13511a53ede776e89415bbe8824aa59b77f763",
+	"project_settings_hash": "c3c03152e78a1563ea7d554db92975162794fdf19e27fac8e3ee60183288c2fc",
+	"contract_versions": {
+		"C01": "FROZEN v1.5",
+		"C02": "FROZEN v1.3",
+		"C03": "FROZEN v1.1",
+		"C04": "FROZEN v1.2",
+		"C05": "FROZEN v1.8",
+		"C06": "FROZEN v1.13",
+		"C07": "FROZEN v1.2",
+		"C08": "FROZEN v1.0",
+		"C10": "FROZEN v1.1"
+	},
+	"content_hash": null,
+	"content_hash_reason": "S3 content is unverified DEV content; per-record hashes are in the science registry (C04 1.2); no build content hash before the first verified record",
+	"model_revision": "pulmonary-0.1",
+	"model_revision_reason": null,
+	"schema_version": 2,
+	"schema_version_reason": null,
+	"build_kind": "DEV",
+	"science_gate_status": "UNVERIFIED",
+	"toolchain_probe": {
+		"engine_ok": true,
+		"template_ok": true,
+		"wasm_member_ok": true,
+		"check_script_ok": true
+	},
+	"host_profile": {
+		"webgl": null,
+		"audio_unlock_required": null,
+		"storage_available": null,
+		"persistent_storage_available": null,
+		"cross_origin_isolated": null
+	},
+	"host_profile_reason": "no browser probe before S1 (D-03)",
+	"template_wasm_sha256": "98c1a16d4466f5b042be96edf8d5c3f02b59ab772824f3f4d54bb8a5a37d467a",
+	"exported_wasm_sha256": "98c1a16d4466f5b042be96edf8d5c3f02b59ab772824f3f4d54bb8a5a37d467a",
+	"export_size_bytes": 23022717
+}

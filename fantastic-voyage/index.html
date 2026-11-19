@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Fantastic Voyage</title>
+		<style>
+html, body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	background-color: #f7f4ec;
+	color: #1e2430;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 16px;
+}
+
+body {
+	overflow: hidden;
+	touch-action: none;
+}
+
+main {
+	position: relative;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.vh {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+#skip-link {
+	position: absolute;
+	left: 8px;
+	top: -200px;
+	z-index: 10;
+	box-sizing: border-box;
+	min-height: 44px;
+	padding: 10px 16px;
+	background: #ffffff;
+	color: #1e2430;
+	border: 2px solid #1e2430;
+	font-size: 16px;
+	line-height: 20px;
+}
+
+#skip-link:focus {
+	top: 6px;
+}
+
+#skip-link:focus, #html_pause:focus, #html_leave:focus {
+	outline: 4px solid #b3400a;
+	outline-offset: 2px;
+}
+
+/* TASK-02-23 (F-02-69): the strip is at least 56 px tall and grows when its text needs more rows, because the
+   marker, the reading and the diagnostic are 16 px and must never be clipped or shortened. Row 1 holds the status
+   and the buttons; the ::before spacer keeps the top-right 200 px clear (it was the right padding). The ::after
+   item is a full-width break, so the three text lines start on their own row(s) below. The canvas below takes
+   the rest of the page height. */
+[data-fv-region] {
+	position: relative;
+	flex: 0 0 auto;
+	box-sizing: border-box;
+	min-height: 56px;
+	padding: 1px 8px;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0 8px;
+	background: #f7f4ec;
+	overflow: hidden;
+}
+
+[data-fv-region]::before {
+	content: "";
+	order: 1;
+	flex: 0 0 200px;
+	height: 0;
+}
+
+[data-fv-region]::after {
+	content: "";
+	order: 1;
+	flex: 0 0 100%;
+	height: 0;
+}
+
+[data-fv-region] button {
+	flex: 0 0 auto;
+	box-sizing: border-box;
+	min-width: 44px;
+	min-height: 44px;
+	padding: 0 14px;
+	background: #1e2430;
+	color: #ffffff;
+	border: 2px solid #1e2430;
+	border-radius: 4px;
+	font-family: inherit;
+	font-size: 16px;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+#fv-status {
+	flex: 1 1 0;
+	min-width: 0;
+	margin: 0 0 0 8px;
+	font-size: 16px;
+	line-height: 18px;
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+}
+
+/* The owner, 2026-11-16 (decision 0035): the status may take a third line, so the objective sentence is not cut. The
+   strip must stay 56 px (decision 0034), so the three lines are 18 px each (54 px) and the strip's top and bottom
+   padding is 1 px: 54 + 2 = 56. The buttons are 44 px and still fit. TASK-03-00 (C06 1.12 strip rule): this holds at
+   every width now (it was 1100 px and under), and the status takes all the free width of its row (flex 1 1 0). */
+
+/* TASK-03-00 (F-02-79, C06 1.12 section 10 "The strip rule"): in the two recovery states (the shell sets
+   data-fv-recovery on the region) the status line has its own full-width row above the buttons: the row's free
+   width, less the 200 px at the top right that stays clear. Visual order there: status, the 200 px spacer, the
+   break, the buttons, then the problem code. The strip's padding is 1 px and the status and the problem code use
+   18 px lines, so that at 1180 x 360 the strip is 100 px (2 + 36 + 44 + 18) and the canvas keeps 260 px. The
+   status text puts the sentences that matter first (html_bridge.gd status_text), so a cut takes the objective,
+   never a warning. At 1100 px or less the recovery buttons share one row, growing evenly and wrapping their
+   text, and the status row's margin below it keeps the buttons out of the top-right 200 x 64 px. */
+[data-fv-region][data-fv-recovery] {
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
+[data-fv-region][data-fv-recovery]::before {
+	order: 2;
+}
+
+[data-fv-region][data-fv-recovery] #fv-status {
+	order: 1;
+	flex: 1 1 0;
+	margin-left: 0;
+	line-height: 18px;
+	-webkit-line-clamp: 2;
+}
+
+[data-fv-region][data-fv-recovery]::after {
+	order: 3;
+}
+
+[data-fv-region][data-fv-recovery] button {
+	order: 4;
+}
+
+[data-fv-region][data-fv-recovery] #fv-diagnostic {
+	order: 5;
+	line-height: 18px;
+}
+
+/* In recovery the status keeps two lines where the page is wide and short (1180 x 360 needs a 100 px strip) and takes
+   a third line elsewhere. */
+@media (max-width: 1100px), (min-height: 500px) {
+	[data-fv-region][data-fv-recovery] #fv-status {
+		-webkit-line-clamp: 3;
+	}
+}
+
+@media (max-width: 1100px) {
+	[data-fv-region][data-fv-recovery] #fv-status {
+		margin-bottom: 9px;
+	}
+
+	[data-fv-region][data-fv-recovery] button[id^="html_rp_"] {
+		flex: 1 1 0;
+		min-width: 120px;
+	}
+}
+
+/* Decision 0034 (C04 1.1, C06 1.10): the marker and the reading stay in the region, in DOM order and in the
+   accessibility tree, at 16 px, but are visually hidden (the clip technique; never display: none, visibility:
+   hidden or aria-hidden). Sighted students read the canvas copies. The problem code (addendum 1) stays visible and
+   selectable at 16 px in the recovery states: it takes its own row below, so the strip grows there only. */
+#fv-marker, #fv-reading {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+	font-size: 16px;
+	line-height: 20px;
+}
+
+#fv-diagnostic {
+	order: 2;
+	flex: 1 1 100%;
+	max-width: 100%;
+	margin: 0;
+	font-size: 16px;
+	line-height: 20px;
+	overflow-wrap: anywhere;
+	user-select: text;
+}
+
+#fv-marker {
+	font-weight: bold;
+	color: #8a1c0a;
+}
+
+#fv-marker:empty, #fv-reading:empty, #fv-diagnostic:empty {
+	display: none;
+}
+
+[data-fv-region] button[id^="html_rp_"] {
+	flex: 0 1 auto;
+	line-height: 17px;
+	padding: 2px 10px;
+}
+
+#html_rp_restore:focus, #html_rp_download:focus, #html_rp_discard:focus {
+	outline: 4px solid #b3400a;
+	outline-offset: 2px;
+}
+
+#canvas {
+	position: relative;
+	flex: 1 1 0;
+	min-height: 0;
+	width: 100%;
+	display: block;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: #0f141f;
+}
+
+#canvas:focus {
+	outline: none;
+}
+
+#canvas:focus-visible {
+	outline: 4px solid #ffd54a;
+	outline-offset: -4px;
+}
+
+/* TASK-03-04 (C07 1.2 section 6, C06 1.12 section 10): the mission panel. #fv-mission is a zero-height flex item between
+   the strip and the canvas (the DOM order of C06 1.12: after html_leave, before the canvas), so the canvas keeps its size.
+   The panel hangs from its top edge, over the canvas, and never reaches the canvas's marker band: its max-height is the
+   canvas height less the band, set by the page script (--fv-ms-max, layoutMission). Taller content scrolls inside it.
+   --fv-text-step (1, 2 or 3, set by setTextStep) scales its text and controls: 16, 20, 24 px, as the canvas UI does. The
+   14 px of top padding keeps the text out of the top-right 200 x 64 px that stays clear. */
+:root {
+	--fv-text-step: 1;
+}
+
+#fv-mission {
+	position: relative;
+	flex: 0 0 0;
+	height: 0;
+	z-index: 5;
+}
+
+#html_ms_panel {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	box-sizing: border-box;
+	max-height: var(--fv-ms-max, 0px);
+	overflow-x: hidden;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	touch-action: pan-y;
+	padding: 14px 16px 12px;
+	background: #f7f4ec;
+	color: #1e2430;
+	border-bottom: 2px solid #1e2430;
+	font-size: calc(12px + 4px * var(--fv-text-step));
+	line-height: 1.4;
+}
+
+#html_ms_panel .ms-inner {
+	max-width: 760px;
+}
+
+#html_ms_head {
+	margin: 0 0 8px;
+	font-size: 1.15em;
+	line-height: 1.3;
+}
+
+#html_ms_head:focus, #html_ms_panel button:focus, #html_ms_panel input:focus, #html_ms_panel summary:focus {
+	outline: 4px solid #b3400a;
+	outline-offset: 2px;
+}
+
+/* Focus scrolls a control into view with room for its 4 px outline and 2 px offset, so the panel's edge never cuts the ring. */
+#html_ms_head, #html_ms_panel button, #html_ms_panel input, #html_ms_panel summary, #html_ms_panel .ms-choice {
+	scroll-margin: 10px;
+}
+
+#html_ms_panel .ms-line {
+	margin: 0 0 8px;
+	overflow-wrap: anywhere;
+}
+
+#html_ms_panel .ms-label {
+	font-weight: bold;
+}
+
+#html_ms_panel .ms-reading, #html_ms_panel .ms-feedback, #html_ms_panel .ms-refusal {
+	padding-left: 8px;
+	border-left: 4px solid #1e2430;
+}
+
+#html_ms_panel .ms-feedback, #html_ms_panel .ms-refusal {
+	border-left-color: #b3400a;
+}
+
+#html_ms_panel .ms-refusal {
+	font-weight: bold;
+}
+
+#html_ms_panel .ms-hint {
+	font-style: italic;
+}
+
+#html_ms_panel .ms-journal {
+	padding: 2px 8px;
+	background: #ebe6d8;
+}
+
+#html_ms_panel .ms-controls {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 8px;
+	margin-top: 12px;
+}
+
+#html_ms_panel .ms-controls > .ms-ctl {
+	flex: 1 1 100%;
+	min-width: 0;
+}
+
+#html_ms_panel button {
+	flex: 0 1 auto;
+	box-sizing: border-box;
+	max-width: 100%;
+	min-width: 44px;
+	min-height: 44px;
+	padding: 6px 14px;
+	background: #1e2430;
+	color: #ffffff;
+	border: 2px solid #1e2430;
+	border-radius: 4px;
+	font-family: inherit;
+	font-size: 1em;
+	font-weight: bold;
+	line-height: 1.25;
+	white-space: normal;
+	cursor: pointer;
+}
+
+#html_ms_panel .ms-rlabel {
+	display: block;
+	font-weight: bold;
+}
+
+#html_ms_panel input[type="range"] {
+	display: block;
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 480px;
+	height: 44px;
+	margin: 0;
+	accent-color: #1e2430;
+}
+
+#html_ms_panel .ms-stops {
+	display: flex;
+	justify-content: space-between;
+	gap: 8px;
+	max-width: 480px;
+}
+
+#html_ms_panel .ms-stops span[data-ms-current] {
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+#html_ms_panel details summary {
+	display: list-item;
+	list-style-position: inside;
+	box-sizing: border-box;
+	min-height: 44px;
+	padding: 10px 0;
+	cursor: pointer;
+}
+
+#html_ms_panel details .ms-dbody {
+	padding: 0 0 8px 8px;
+}
+
+#html_ms_panel fieldset {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	min-width: 0;
+}
+
+#html_ms_panel legend {
+	padding: 0 0 4px;
+	font-weight: bold;
+}
+
+#html_ms_panel .ms-choice {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	box-sizing: border-box;
+	min-height: 44px;
+	cursor: pointer;
+}
+
+#html_ms_panel .ms-choice input[type="radio"] {
+	flex: 0 0 auto;
+	width: 24px;
+	height: 24px;
+	margin: 0;
+	accent-color: #1e2430;
+}
+
+@media (forced-colors: active) {
+	#html_ms_panel {
+		border-bottom-color: CanvasText;
+	}
+	#html_ms_head:focus, #html_ms_panel button:focus, #html_ms_panel input:focus, #html_ms_panel summary:focus {
+		outline-color: Highlight;
+	}
+}
+
+@media (forced-colors: active) {
+	#skip-link, [data-fv-region] button {
+		border-color: CanvasText;
+	}
+	#skip-link:focus, #html_pause:focus, #html_leave:focus, #canvas:focus-visible {
+		outline-color: Highlight;
+	}
+}
+		</style>
+		<link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png" />
+<link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
+
+	</head>
+	<body>
+		<a id="skip-link" href="#canvas">Skip to the game</a>
+		<main>
+			<h1 class="vh">Fantastic Voyage</h1>
+			<section data-fv-region="1" aria-label="Game status">
+				<p id="fv-marker"></p>
+				<p id="fv-status" role="status" aria-live="polite">Loading the game.</p>
+				<p id="fv-reading"></p>
+				<button id="html_pause" type="button">Pause</button>
+				<button id="html_leave" type="button">Leave game</button>
+				<p id="fv-diagnostic"></p>
+			</section>
+			<canvas id="canvas" role="application" tabindex="0" aria-label="Fantastic Voyage game. Use Tab to reach the game's buttons."></canvas>
+			<noscript>
+				<p>Fantastic Voyage needs JavaScript to run. Turn it on, or try another browser.</p>
+			</noscript>
+		</main>
+
+		<script>
+// The status region and its buttons (C06 section 10). Game-local API: the game fills onAction,
+// onEntry and onVisibility through JavaScriptBridge callbacks (C08 section 5). Nothing here talks
+// to any other window.
+(function () {
+	'use strict';
+	const ENTRY_WINDOW_MS = 500;
+	const canvas = document.getElementById('canvas');
+	const region = document.querySelector('[data-fv-region]');
+	const skipLink = document.getElementById('skip-link');
+	const statusLine = document.getElementById('fv-status');
+	const pauseButton = document.getElementById('html_pause');
+	const leaveButton = document.getElementById('html_leave');
+	const markerLine = document.getElementById('fv-marker');
+	const readingLine = document.getElementById('fv-reading');
+	const diagnosticLine = document.getElementById('fv-diagnostic');
+	const RP_BUTTONS = [
+		{ id: 'html_rp_restore', action: 'rp_restore', label: 'Restore my last good save' },
+		{ id: 'html_rp_download', action: 'rp_download', label: 'Download the damaged file' },
+		{ id: 'html_rp_discard', action: 'rp_discard', label: 'Delete the damaged file and start new' },
+	];
+	const RP_FOR_KIND = {
+		'full': ['html_rp_restore', 'html_rp_download', 'html_rp_discard'],
+		'nosnap': ['html_rp_download', 'html_rp_discard'],
+	};
+	const DIAGNOSTIC_PREFIX = 'Problem code: ';
+
+	const lastKey = { tab: false, shift: false, at: -Infinity };
+	let lastPointerAt = -Infinity;
+	let skipPending = false;
+	// TASK-03-06 (C06 1.12 section 6.3, the second panel-focus rule): true while the shell itself moves DOM focus from
+	// the mission panel to the canvas. That focusin is no entry: the game's stop is already `flight`.
+	let missionFocus = false;
+	let refocusArmed = false;
+	let recoveryKind = '';
+
+	function observe(event, target, value) {
+		console.log('fv:shell event=' + event + ' target=' + target + ' value=' + encodeValue(String(value).replace(/ /g, '_')));
+	}
+
+	// F-02-41: percent-encode each character outside printable ASCII, so a marker line stays plain ASCII.
+	// A lone surrogate cannot be encoded as itself: it becomes U+FFFD. C06 1.11: a literal "%" is written
+	// "%25", so a value decodes one way only; no other ASCII character is encoded.
+	function encodeValue(text) {
+		return text.replace(/[^ -~]|%/gu, function (ch) {
+			try {
+				return encodeURIComponent(ch);
+			} catch (e) {
+				return '%EF%BF%BD';
+			}
+		});
+	}
+
+	const shell = {
+		onAction: null,
+		onEntry: null,
+		onVisibility: null,
+		// F-02-42, F-02-47 (C05 1.3 section 6): the game's callbacks for the engine's failed-copy report.
+		// onStorageCandidate(reason): a first report, not yet the signal. onStorageFailure(reason): confirmed, and
+		// storageFailure keeps the reason for a game that attaches later. onStorageRecovered(): the next copy was
+		// clean, so the candidate is dismissed. storageCandidate holds a pending candidate's reason ('' when none);
+		// storageWatching is true while a copy that started after the candidate has not ended.
+		// copyLog is a bounded record of the copies the shell observed (evidence only).
+		onStorageCandidate: null,
+		onStorageFailure: null,
+		onStorageRecovered: null,
+		storageCandidate: '',
+		storageWatching: false,
+		// C05 1.4 section 6 step 5: storageBusy is true while any transaction on the engine's database /userfs, of
+		// any mode, is open (from its creation to one task after its first complete, error or abort). storageBusySince
+		// is the performance.now() of the last 0-to-1 change of that count (-1 when none is open). storageBusySeq
+		// counts those 0-to-1 changes, so a game can tell that a transaction began and ended between two samples.
+		// waitLog is a bounded record of the game's confirmation steps (evidence only).
+		storageBusy: false,
+		storageBusySince: -1,
+		storageBusySeq: 0,
+		waitLog: [],
+		noteWait: function (ev, detail) {
+			shell.waitLog.push({ t: Math.round(performance.now() * 10) / 10, ev: String(ev), detail: String(detail) });
+			if (shell.waitLog.length > 200) {
+				shell.waitLog.shift();
+			}
+		},
+		storageFailure: '',
+		copyLog: [],
+		// C05 1.7 section 6 (the saving line; TASK-03-03c): copySeq is the number of the last copy the shell saw
+		// start (0 before the first). onCopyClean(seq) is called when copy `seq` has ended with no failure line, after
+		// any verdict that copy gives. The game reads copySeq at a committed write and takes the write as stored at the
+		// first clean copy with a higher number. Observation only, as above.
+		copySeq: 0,
+		onCopyClean: null,
+		// Set by the loader script below: {persistent: false, reason: 'NO_INDEXEDDB'} or {persistent: true}.
+		storage: null,
+		setMarker: function (text) {
+			markerLine.textContent = String(text);
+			observe('region', 'fv-marker', text);
+		},
+		setReading: function (text) {
+			readingLine.textContent = String(text);
+			observe('region', 'fv-reading', text);
+		},
+		// C06 section 6.2: the recovery buttons sit right after html_leave, so nothing focusable lies
+		// between them and the canvas. The same kind again only updates the diagnostic (F-02-36).
+		setRecovery: function (kind, diagnostic) {
+			const k = RP_FOR_KIND[kind] ? kind : '';
+			if (k !== recoveryKind) {
+				const want = k === '' ? [] : RP_FOR_KIND[k];
+				const active = document.activeElement;
+				let removing = false;
+				RP_BUTTONS.forEach(function (spec) {
+					const el = document.getElementById(spec.id);
+					if (el && want.indexOf(spec.id) < 0 && el === active) {
+						removing = true;
+					}
+				});
+				if (removing) {
+					pauseButton.focus();
+					observe('focus', 'html_pause', 'recovery_closed');
+				}
+				let anchor = leaveButton;
+				RP_BUTTONS.forEach(function (spec) {
+					let el = document.getElementById(spec.id);
+					if (want.indexOf(spec.id) < 0) {
+						if (el) {
+							el.remove();
+						}
+						return;
+					}
+					if (!el) {
+						el = document.createElement('button');
+						el.id = spec.id;
+						el.type = 'button';
+						el.textContent = spec.label;
+						el.addEventListener('click', function () { press(el, spec.action); });
+						anchor.after(el);
+					}
+					anchor = el;
+				});
+				recoveryKind = k;
+			}
+			if (k === '') {
+				region.removeAttribute('data-fv-recovery');
+			} else {
+				region.setAttribute('data-fv-recovery', k);
+			}
+			diagnosticLine.textContent = k === '' ? '' : DIAGNOSTIC_PREFIX + String(diagnostic || '');
+		},
+		setStatus: function (text, pauseLabel) {
+			// From the game's first write on, the loader's progress must not write here again (F-01-29).
+			statusLine.setAttribute('data-fv-game-wrote', '1');
+			statusLine.textContent = String(text);
+			if (pauseLabel) {
+				pauseButton.textContent = String(pauseLabel);
+			}
+			observe('region', 'fv-status', text);
+		},
+		focusSkipLink: function () {
+			skipLink.focus();
+			observe('focus', 'skip-link', 'standalone_exit');
+		},
+		// C06 1.4 section 6.3: on every EXIT the canvas gives up DOM focus before any message is sent, so the
+		// game holds no keyboard capture whatever the host then does with focus.
+		releaseCanvas: function () {
+			refocusArmed = false;
+			canvas.blur();
+			observe('focus', 'canvas', 'exit_blur');
+		},
+		// C06 1.8 section 6.3: Shift+Tab before the first stop. The canvas gives up DOM focus and the element
+		// immediately before it in DOM order takes it. Nothing is sent to any other window.
+		reverseOut: function () {
+			refocusArmed = false;
+			canvas.blur();
+			// C06 1.12: html_ms_last in PANEL:mission, the last control of the step that Tab reaches (none while a run lasts).
+			const target = document.getElementById('html_rp_discard') || msLast() || leaveButton;
+			target.focus();
+			observe('focus', target.id, 'reverse_out');
+		},
+	};
+	window.fvShell = shell;
+
+	function press(button, action) {
+		observe('button', button.id, 'pressed');
+		if (typeof shell.onAction === 'function') {
+			shell.onAction(action);
+		}
+	}
+	pauseButton.addEventListener('click', function () { press(pauseButton, 'pause'); });
+	leaveButton.addEventListener('click', function () { press(leaveButton, 'leave'); });
+
+	// === The mission panel (TASK-03-04; C07 1.2 section 6, C06 1.12 sections 6.3 and 10) ===
+	// setMissionPanel(description) draws the panel from MissionPanelView's description (an object, or its JSON text, which
+	// is how the game sends it) and setMissionPanel(null) removes it and all its controls from the DOM. The panel has no
+	// state of its own: a control changes nothing in the game until its button is pressed, and a button calls
+	// shell.onMissionAction(action, values) with the values it collects as strings, keyed by control id. Every text is set
+	// with textContent. announce is not used here: the game writes it to the status line.
+	const MS_HEAD_ID = 'html_ms_head';
+	const MS_KINDS = { text: 'ms-text', label: 'ms-label', reading: 'ms-reading', feedback: 'ms-feedback', refusal: 'ms-refusal', hint: 'ms-hint', journal: 'ms-journal' };
+	let msWrap = null;
+	let msPanel = null;
+	let msStep = '';
+	let msControls = {};
+	let msRanges = [];
+
+	function msEl(tag, cls, text) {
+		const e = document.createElement(tag);
+		if (cls) {
+			e.className = cls;
+		}
+		if (text !== undefined) {
+			e.textContent = String(text);
+		}
+		return e;
+	}
+
+	// The marker band (C06 1.12 section 10): the canvas's marker line at the current text step (the label's height is about
+	// 1.4 times its font size, up to 1.1 CSS px per UI unit), the 4 UI unit gap under it, and the 8 px clear ring above it.
+	function layoutMission() {
+		if (!msPanel) {
+			return;
+		}
+		const step = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--fv-text-step'), 10) || 1;
+		const font = 12 + 4 * step;
+		const band = Math.ceil((1.4 * font + 4) * 1.1 + 12);
+		const h = canvas.getBoundingClientRect().height;
+		document.documentElement.style.setProperty('--fv-ms-max', Math.max(0, Math.floor(h - band)) + 'px');
+	}
+
+	function msCapture() {
+		const out = {};
+		Object.keys(msControls).forEach(function (id) {
+			out[id] = msControls[id].get();
+		});
+		return out;
+	}
+
+	function msPress(button, c) {
+		observe('button', button.id, 'pressed');
+		const values = {};
+		(Array.isArray(c.collect) ? c.collect : []).forEach(function (id) {
+			values[id] = msControls[id] ? msControls[id].get() : '';
+		});
+		if (typeof shell.onMissionAction === 'function') {
+			shell.onMissionAction(String(c.action), values);
+		}
+	}
+
+	function msButton(c) {
+		const b = msEl('button', '', c.label);
+		b.id = String(c.id);
+		b.type = 'button';
+		b.addEventListener('click', function () { msPress(b, c); });
+		return b;
+	}
+
+	function msRange(c, saved) {
+		const stops = Array.isArray(c.stops) ? c.stops : [];
+		const wrap = msEl('div', 'ms-ctl ms-range');
+		const label = msEl('label', 'ms-rlabel', c.label);
+		label.htmlFor = String(c.id);
+		const input = msEl('input');
+		input.type = 'range';
+		input.id = String(c.id);
+		input.min = '1';
+		input.max = String(Math.max(1, stops.length));
+		input.step = '1';
+		const want = saved && saved[c.id] !== undefined ? saved[c.id] : c.value;
+		let idx = stops.findIndex(function (s) { return s.value === want; });
+		input.value = String(idx < 0 ? 1 : idx + 1);
+		const row = msEl('div', 'ms-stops');
+		row.setAttribute('aria-hidden', 'true');
+		const spans = stops.map(function (s) { return row.appendChild(msEl('span', '', s.text)); });
+		const handle = {
+			kind: 'range',
+			get: function () { const s = stops[parseInt(input.value, 10) - 1]; return s ? String(s.value) : ''; },
+			update: function () {
+				const i = parseInt(input.value, 10) - 1;
+				if (stops[i]) {
+					input.setAttribute('aria-valuetext', String(stops[i].text));
+				}
+				spans.forEach(function (sp, k) { if (k === i) { sp.setAttribute('data-ms-current', '1'); } else { sp.removeAttribute('data-ms-current'); } });
+			},
+			followers: [],
+		};
+		input.addEventListener('input', function () {
+			handle.update();
+			handle.followers.forEach(function (f) { f(); });
+		});
+		wrap.appendChild(label);
+		wrap.appendChild(input);
+		wrap.appendChild(row);
+		msControls[c.id] = handle;
+		msRanges.push(handle);
+		return wrap;
+	}
+
+	function msDisclosure(c, saved) {
+		const wrap = msEl('div', 'ms-ctl');
+		const details = msEl('details');
+		details.id = String(c.id);
+		details.appendChild(msEl('summary', '', c.label));
+		const body = details.appendChild(msEl('div', 'ms-dbody', c.text));
+		if (saved && saved[c.id] === '1') {
+			details.open = true;
+		}
+		msControls[c.id] = { kind: 'disclosure', get: function () { return details.open ? '1' : '0'; } };
+		const numbers = Array.isArray(c.numbers) ? c.numbers : [];
+		const target = msControls[c.follows];
+		if (target && target.kind === 'range') {
+			const follow = function () {
+				const hit = numbers.find(function (n) { return n.value === target.get(); });
+				if (hit) {
+					body.textContent = String(hit.text);
+				}
+			};
+			target.followers.push(follow);
+			follow();
+		}
+		wrap.appendChild(details);
+		return wrap;
+	}
+
+	function msRadio(c, saved) {
+		const wrap = msEl('div', 'ms-ctl');
+		const set = msEl('fieldset');
+		set.id = String(c.id);
+		set.appendChild(msEl('legend', '', c.label));
+		const choices = Array.isArray(c.choices) ? c.choices : [];
+		const inputs = [];
+		choices.forEach(function (ch) {
+			const row = msEl('label', 'ms-choice');
+			const input = msEl('input');
+			input.type = 'radio';
+			input.name = String(c.id);
+			input.id = c.id + '__' + ch.value;
+			input.value = String(ch.value);
+			if (saved && saved[c.id] === input.value) {
+				input.checked = true;
+			}
+			inputs.push(input);
+			row.appendChild(input);
+			row.appendChild(msEl('span', '', ch.text));
+			set.appendChild(row);
+		});
+		msControls[c.id] = { kind: 'radio', get: function () { const on = inputs.find(function (i) { return i.checked; }); return on ? on.value : ''; } };
+		wrap.appendChild(set);
+		return wrap;
+	}
+
+	function drawMission(desc) {
+		const active = document.activeElement;
+		const inPanel = msPanel !== null && msPanel.contains(active);
+		const onCanvas = active === canvas;
+		const sameStep = msPanel !== null && desc.step === msStep;
+		const activeId = inPanel ? active.id : '';
+		const saved = sameStep ? msCapture() : {};
+		const scrollTop = sameStep ? msPanel.scrollTop : 0;
+		if (msWrap === null) {
+			msWrap = msEl('div');
+			msWrap.id = 'fv-mission';
+			msPanel = msEl('section');
+			msPanel.id = 'html_ms_panel';
+			msPanel.setAttribute('aria-labelledby', MS_HEAD_ID);
+			msWrap.appendChild(msPanel);
+			canvas.before(msWrap);
+		}
+		msPanel.replaceChildren();
+		msControls = {};
+		msRanges = [];
+		const inner = msPanel.appendChild(msEl('div', 'ms-inner'));
+		const head = inner.appendChild(msEl('h2', '', desc.heading));
+		head.id = MS_HEAD_ID;
+		head.tabIndex = -1;
+		const lines = inner.appendChild(msEl('div', 'ms-lines'));
+		(Array.isArray(desc.lines) ? desc.lines : []).forEach(function (l) {
+			lines.appendChild(msEl('p', 'ms-line ' + (MS_KINDS[l.kind] || 'ms-text'), l.text));
+		});
+		const box = inner.appendChild(msEl('div', 'ms-controls'));
+		(Array.isArray(desc.controls) ? desc.controls : []).forEach(function (c) {
+			if (c.kind === 'button') {
+				box.appendChild(msButton(c));
+			} else if (c.kind === 'range') {
+				box.appendChild(msRange(c, saved));
+			} else if (c.kind === 'disclosure') {
+				box.appendChild(msDisclosure(c, saved));
+			} else if (c.kind === 'radio') {
+				box.appendChild(msRadio(c, saved));
+			}
+		});
+		msRanges.forEach(function (r) { r.update(); });
+		msStep = String(desc.step);
+		layoutMission();
+		msPanel.scrollTop = scrollTop;
+		if (!sameStep) {
+			// C06 1.12 section 6.3, the first panel-focus rule: DOM focus on the canvas or in the panel moves to the heading;
+			// on skip-link, html_pause or html_leave it stays where it is.
+			if (onCanvas || inPanel) {
+				head.focus();
+				observe('focus', MS_HEAD_ID, msStep);
+			}
+		} else if (inPanel && activeId !== '') {
+			const again = document.getElementById(activeId);
+			if (again) {
+				again.focus({ preventScroll: true });
+			}
+		}
+	}
+
+	// The last element of the open panel that Tab reaches, or null. A radio group is one Tab stop: its checked input,
+	// or its first when none is checked.
+	function msLast() {
+		if (msPanel === null) {
+			return null;
+		}
+		const all = Array.prototype.slice.call(msPanel.querySelectorAll('button, input, summary')).filter(function (el) { return !el.disabled; });
+		if (all.length === 0) {
+			return null;
+		}
+		const last = all[all.length - 1];
+		if (last.type === 'radio') {
+			const group = all.filter(function (el) { return el.type === 'radio' && el.name === last.name; });
+			return group.find(function (el) { return el.checked; }) || group[0];
+		}
+		return last;
+	}
+
+	function removeMission() {
+		if (msWrap !== null) {
+			msWrap.remove();
+		}
+		msWrap = null;
+		msPanel = null;
+		msStep = '';
+		msControls = {};
+		msRanges = [];
+		document.documentElement.style.removeProperty('--fv-ms-max');
+	}
+
+	shell.onMissionAction = null;
+	shell.setMissionPanel = function (d, toCanvas) {
+		let desc = d;
+		if (typeof desc === 'string') {
+			desc = desc === '' ? null : JSON.parse(desc);
+		}
+		if (desc === null || desc === undefined) {
+			const inPanel = msPanel !== null && msPanel.contains(document.activeElement);
+			removeMission();
+			if (toCanvas === true && inPanel) {
+				// C06 1.12 section 6.3, the second panel-focus rule: a panel choice started a route segment.
+				missionFocus = true;
+				canvas.focus();
+				missionFocus = false;
+				observe('focus', 'canvas', 'mission');
+			}
+			return;
+		}
+		drawMission(desc);
+	};
+	// C06 1.12 section 10: the game's text-size step as the page's --fv-text-step (1, 2 or 3).
+	shell.setTextStep = function (n) {
+		const step = Math.max(1, Math.min(3, parseInt(n, 10) || 1));
+		document.documentElement.style.setProperty('--fv-text-step', String(step));
+		layoutMission();
+	};
+	window.addEventListener('resize', layoutMission);
+	if (typeof ResizeObserver === 'function') {
+		new ResizeObserver(layoutMission).observe(canvas);
+	}
+
+	// Entry direction (U-1). Keys and pointer presses are noted in the capture phase; the canvas's
+	// focusin then reads them.
+	document.addEventListener('keydown', function (e) {
+		lastKey.tab = e.key === 'Tab';
+		lastKey.shift = e.shiftKey;
+		lastKey.at = performance.now();
+	}, true);
+	function notePointer() { lastPointerAt = performance.now(); }
+	canvas.addEventListener('pointerdown', notePointer, true);
+	canvas.addEventListener('mousedown', notePointer, true);
+
+	skipLink.addEventListener('click', function (e) {
+		e.preventDefault();
+		skipPending = true;
+		canvas.focus();
+		skipPending = false;
+	});
+
+	// C06 section 6.4 N3: when the window loses focus with the canvas focused, the browser returns focus
+	// to the canvas on its own. That focusin is a refocus, not an entry.
+	window.addEventListener('blur', function (e) {
+		if (e.target === window) {
+			refocusArmed = document.activeElement === canvas;
+		}
+	});
+
+	canvas.addEventListener('focusin', function () {
+		if (missionFocus) {
+			refocusArmed = false;
+			return;
+		}
+		let dir = 'reverse';
+		const now = performance.now();
+		const keyAge = now - lastKey.at;
+		const pointerAge = now - lastPointerAt;
+		const armed = refocusArmed;
+		refocusArmed = false;
+		const recentPointer = pointerAge <= ENTRY_WINDOW_MS && pointerAge <= keyAge;
+		const recentTab = keyAge <= ENTRY_WINDOW_MS && lastKey.tab;
+		if (skipPending) {
+			dir = 'forward';
+		} else if (recentPointer) {
+			return;
+		} else if (recentTab) {
+			dir = lastKey.shift ? 'reverse' : 'forward';
+		} else if (armed) {
+			observe('focus', 'canvas', 'refocus');
+			return;
+		}
+		if (typeof shell.onEntry === 'function') {
+			shell.onEntry(dir);
+		}
+	});
+
+	// The export preset uses canvas_resize_policy 0 (none): Godot then leaves the canvas to the page
+	// and follows its pixel size. Policy 2 sizes the canvas to the whole window and would cover the
+	// region, so this keeps the canvas's drawing size equal to its CSS box times the pixel ratio.
+	function fitCanvas() {
+		const ratio = window.devicePixelRatio || 1;
+		const box = canvas.getBoundingClientRect();
+		const w = Math.max(1, Math.round(box.width * ratio));
+		const h = Math.max(1, Math.round(box.height * ratio));
+		if (canvas.width !== w || canvas.height !== h) {
+			canvas.width = w;
+			canvas.height = h;
+		}
+	}
+	fitCanvas();
+	window.addEventListener('resize', fitCanvas);
+	if (typeof ResizeObserver === 'function') {
+		new ResizeObserver(fitCanvas).observe(canvas);
+	}
+
+	document.addEventListener('visibilitychange', function () {
+		if (typeof shell.onVisibility === 'function') {
+			shell.onVisibility(document.visibilityState === 'visible');
+		}
+	});
+}());
+		</script>
+		<script src="index.js"></script>
+		<script>
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":0,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":335148,"index.wasm":22323523},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_THREADS_ENABLED = false;
+
+(function () {
+	const statusLine = document.getElementById('fv-status');
+
+	function fail(text) {
+		console.error(text);
+		statusLine.textContent = text;
+	}
+
+	if (typeof Engine === 'undefined') {
+		fail('The game files did not load. Check the connection and reload the page.');
+		return;
+	}
+	const missing = Engine.getMissingFeatures({ threads: GODOT_THREADS_ENABLED });
+	if (missing.length !== 0) {
+		fail('This browser is missing something the game needs (' + missing.join(', ') + '). Try an up-to-date Chrome, Edge or Firefox.');
+		return;
+	}
+	// Without IndexedDB (blocked storage on some school devices) the engine aborts at start when it
+	// mounts its persistent user folder (IDBFS). S1 saves nothing, so run without persistence instead
+	// (T-01-HOST-01 negative; S1-OP-03 fix).
+	// F-02-42, F-02-47 (C05 1.3 section 6): the engine copies user:// to IndexedDB asynchronously and reports a
+	// failed copy only by logging "Failed to save IDB file system: <message>" (Godot 4.5 GodotFS.sync, the C01
+	// pinned engine). The game's own write and read-back see only the in-memory copy (U-3), so the shell passes
+	// the report on. One such line is a CANDIDATE: a copy can fail because a file it had listed was removed (a
+	// Discard during the boot copy), and the next copy succeeds. The shell watches the first copy that STARTS
+	// after the candidate and reports it: it failed (onStorageFailure: confirmed) or it ended clean
+	// (onStorageRecovered: dismissed). The shell only observes: a wrapper on IDBDatabase.prototype.transaction
+	// counts a copy as started at a readwrite transaction on FILE_DATA of /userfs (what IDBFS reconcile opens when
+	// something differs) and as ended one task after its complete, error or abort event, so the engine's own handler,
+	// which logs the failure line, has run first. It makes no request of its own.
+	// C05 1.4 (F-02-54): the same wrapper counts every transaction on /userfs, a read or a write, as open until one
+	// task after its first end event (storageBusy, storageBusySince, storageBusySeq). A read alone is never a copy and
+	// never gives a verdict.
+	const SYNC_FAIL = 'Failed to save IDB file system: ';
+	const fv = window.fvShell;
+	const copyLog = fv.copyLog;
+	const COPY_LOG_MAX = 600;
+	function noteCopy(ev, seq, detail) {
+		copyLog.push({ t: Math.round(performance.now() * 10) / 10, ev: ev, seq: seq, detail: detail === undefined ? '' : detail });
+		if (copyLog.length > COPY_LOG_MAX) {
+			copyLog.shift();
+		}
+	}
+	let copySeq = 0;
+	let openCopies = [];
+	let openTx = 0;
+	// Every transaction on /userfs, of any mode: busy from creation to one task after its first end event.
+	function busyOpened(tx) {
+		openTx += 1;
+		if (openTx === 1) {
+			fv.storageBusy = true;
+			fv.storageBusySince = performance.now();
+			fv.storageBusySeq += 1;
+			noteCopy('busy', fv.storageBusySeq, 'on');
+		}
+		let ended = false;
+		function end() {
+			if (ended) {
+				return;
+			}
+			ended = true;
+			setTimeout(function () {
+				openTx -= 1;
+				if (openTx === 0) {
+					fv.storageBusy = false;
+					fv.storageBusySince = -1;
+					noteCopy('busy', fv.storageBusySeq, 'off');
+				}
+			}, 0);
+		}
+		tx.addEventListener('complete', end);
+		tx.addEventListener('error', end);
+		tx.addEventListener('abort', end);
+	}
+	// {reason, afterSeq, watch}: afterSeq is the last copy started before the candidate; watch is the first copy
+	// started after it (0 until one starts).
+	let candidate = null;
+	function reasonOf(message) {
+		return /quota/i.test(message) ? 'QUOTA_EXCEEDED' : 'STORAGE_UNAVAILABLE';
+	}
+	function confirmFailure(reason) {
+		candidate = null;
+		fv.storageWatching = false;
+		fv.storageCandidate = '';
+		noteCopy('verdict', copySeq, 'failed ' + reason);
+		if (fv.storageFailure === '') {
+			fv.storageFailure = reason;
+			if (typeof fv.onStorageFailure === 'function') {
+				fv.onStorageFailure(reason);
+			}
+		}
+	}
+	function dismissCandidate() {
+		candidate = null;
+		fv.storageWatching = false;
+		fv.storageCandidate = '';
+		noteCopy('verdict', copySeq, 'recovered');
+		if (typeof fv.onStorageRecovered === 'function') {
+			fv.onStorageRecovered();
+		}
+	}
+	function onFailureLine(message) {
+		if (fv.storageFailure !== '') {
+			return;
+		}
+		const reason = reasonOf(message);
+		const open = openCopies.length > 0 ? openCopies[openCopies.length - 1] : null;
+		if (open) {
+			open.failed = true;
+		}
+		noteCopy('fail-line', open ? open.seq : 0, message);
+		if (candidate === null) {
+			candidate = { reason: reason, afterSeq: copySeq, watch: 0 };
+			fv.storageCandidate = reason;
+			noteCopy('candidate', copySeq, reason);
+			if (typeof fv.onStorageCandidate === 'function') {
+				fv.onStorageCandidate(reason);
+			}
+			return;
+		}
+		// A failure line from a copy that started before the candidate is part of that candidate.
+		if (open && open.seq <= candidate.afterSeq) {
+			return;
+		}
+		confirmFailure(reason);
+	}
+	function copyStarted(tx) {
+		copySeq += 1;
+		fv.copySeq = copySeq;
+		const copy = { seq: copySeq, failed: false, ended: false, first: false };
+		openCopies.push(copy);
+		noteCopy('start', copy.seq);
+		if (candidate !== null && candidate.watch === 0) {
+			candidate.watch = copy.seq;
+			fv.storageWatching = true;
+		}
+		function settle(kind) {
+			if (copy.first) {
+				return;
+			}
+			copy.first = true;
+			noteCopy('event', copy.seq, kind);
+			setTimeout(function () {
+				copy.ended = true;
+				openCopies = openCopies.filter(function (c) { return c !== copy; });
+				noteCopy('end', copy.seq, kind + (copy.failed ? ' failed' : ''));
+				if (candidate !== null && candidate.watch === copy.seq && fv.storageFailure === '') {
+					if (copy.failed) {
+						confirmFailure(candidate.reason);
+					} else {
+						dismissCandidate();
+					}
+				}
+				if (!copy.failed && typeof fv.onCopyClean === 'function') {
+					fv.onCopyClean(copy.seq);
+				}
+			}, 0);
+		}
+		tx.addEventListener('complete', function () { settle('complete'); });
+		tx.addEventListener('error', function () { settle('error'); });
+		tx.addEventListener('abort', function () { settle('abort'); });
+	}
+	if (window.IDBDatabase && IDBDatabase.prototype && typeof IDBDatabase.prototype.transaction === 'function') {
+		const origTransaction = IDBDatabase.prototype.transaction;
+		IDBDatabase.prototype.transaction = function (stores, mode) {
+			const tx = origTransaction.apply(this, arguments);
+			try {
+				if (this.name === '/userfs') {
+					busyOpened(tx);
+				}
+				const names = typeof stores === 'string' ? [stores] : Array.prototype.slice.call(stores || []);
+				if (this.name === '/userfs' && mode === 'readwrite' && names.indexOf('FILE_DATA') >= 0) {
+					copyStarted(tx);
+				}
+			} catch (e) { /* observing only */ }
+			return tx;
+		};
+	}
+	const consoleError = console.error.bind(console);
+	console.error = function () {
+		const first = arguments.length > 0 ? String(arguments[0]) : '';
+		const result = consoleError.apply(null, arguments);
+		if (first.indexOf(SYNC_FAIL) === 0) {
+			onFailureLine(first);
+		}
+		return result;
+	};
+	if (!window.indexedDB) {
+		GODOT_CONFIG.persistentPaths = [];
+		window.fvShell.storage = { persistent: false, reason: 'NO_INDEXEDDB' };
+	} else {
+		window.fvShell.storage = { persistent: true };
+	}
+	const engine = new Engine(GODOT_CONFIG);
+	engine.startGame({
+		'onProgress': function (current, total) {
+			if (current > 0 && total > 0 && !statusLine.hasAttribute('data-fv-game-wrote')) {
+				statusLine.textContent = 'Loading the game: ' + Math.round(100 * current / total) + ' percent.';
+			}
+		},
+	}).then(function () {
+		return null;
+	}, function (err) {
+		fail('Something went wrong while starting the game. Reload the page to try again. (' + (err && err.message ? err.message : String(err)) + ')');
+	});
+}());
+		</script>
+	</body>
+</html>
+
