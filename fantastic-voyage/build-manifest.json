@@ -1,6 +1,6 @@
 {
-	"build_id": "DEV-5cb19fb-20261119T090708Z",
-	"git_commit": "5cb19fbd308a22fd0a5e5e9215bd6c9aed53bbf2",
+	"build_id": "DEV-f35cf01-20261120T041815Z",
+	"git_commit": "f35cf011dbca3cebde93186e9b3dc9a96a5fa8b1",
 	"godot_version": "4.5.stable.official.876b29033",
 	"godot_binary_sha256": "5ea93bab9cb6d2dc0824a41e8465828390f7e870535cd8f0690dcf6fa9db0fd2",
 	"export_template_sha256": "a50579d16fc957df1e9370a17d8d042208977fd271a4288b230fe94a033fabcb",
@@ -13,7 +13,7 @@
 		"C04": "FROZEN v1.2",
 		"C05": "FROZEN v1.8",
 		"C06": "FROZEN v1.13",
-		"C07": "FROZEN v1.2",
+		"C07": "FROZEN v1.3",
 		"C08": "FROZEN v1.0",
 		"C10": "FROZEN v1.1"
 	},
@@ -41,5 +41,5 @@
 	"host_profile_reason": "no browser probe before S1 (D-03)",
 	"template_wasm_sha256": "98c1a16d4466f5b042be96edf8d5c3f02b59ab772824f3f4d54bb8a5a37d467a",
 	"exported_wasm_sha256": "98c1a16d4466f5b042be96edf8d5c3f02b59ab772824f3f4d54bb8a5a37d467a",
-	"export_size_bytes": 23022717
+	"export_size_bytes": 23024893
 }
